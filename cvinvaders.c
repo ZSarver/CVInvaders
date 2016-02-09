@@ -18,6 +18,11 @@ int main(int argc, char *argv[])
       printf("oops you bwoke it \n SDL_VideoInit failed \n");
       return 1;
     }
+  if (TTF_Init() != 0)
+    {
+      printf("oops you bwoke it \n TTF_Init failed \n");
+      return 1;
+    }
 
   //create window
   SDL_Window* window  = SDL_CreateWindow("test", 100, 100, 800, 600, 0);
@@ -37,9 +42,39 @@ int main(int argc, char *argv[])
   rect.h = 200;
   rect.w = 200;
   
-
+  //open font
+  TTF_Font* orbitron = TTF_OpenFont("theleagueof-orbitron-13e6a52\\Orbitron Light.ttf",15);
+  if (!orbitron)
+    {
+      printf("oops you bwoke it \n TTF_OpenFont failed \n");
+      return 1;
+    }
+  SDL_Color textColor;
+  textColor.r = 255;
+  textColor.g = 255;
+  textColor.b = 255;
+  textColor.a = 255;
+  SDL_Rect textRect;
+  textRect.x = 50;
+  textRect.y = 50;
+  textRect.h = 15;
+  textRect.w = 200;
+  SDL_Surface* text = TTF_RenderText_Blended(orbitron, "oh hello there", textColor);
+  if (text == NULL)
+    {
+      printf("oops you bwoke it \n TTF_RenderText_Blended failed \n");
+      return 1;
+    }
+  SDL_Texture* textTex = SDL_CreateTextureFromSurface(rend, text);
+  if (textTex == NULL)
+    {
+      printf("oops you bwoke it \n SDL_CreateTextureFromSurface failed \n");
+      return 1;
+    }
+  SDL_SetTextureBlendMode(textTex,SDL_BLENDMODE_BLEND);
+  
   //dark grey, cooler than black
-  SDL_SetRenderDrawColor(rend, 130, 130, 130, 255);
+  SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
   //event loop
   SDL_Event event;
   bool shouldQuit = false;
@@ -48,6 +83,7 @@ int main(int argc, char *argv[])
     {
       //let's draw some stuff
       SDL_RenderClear(rend);
+      SDL_RenderCopy(rend, textTex, NULL, &textRect);
       SDL_RenderCopyEx(rend, tex, NULL, &rect, frame, NULL, SDL_FLIP_NONE);
       SDL_RenderPresent(rend);
       
@@ -63,6 +99,7 @@ int main(int argc, char *argv[])
     }
   
   SDL_DestroyWindow(window);
+  TTF_Quit();
   SDL_Quit();
   return 0;
 }
