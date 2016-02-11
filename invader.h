@@ -2,11 +2,15 @@
 #define INVADER_H
 
 #include "SDL.h"
+#include "SDL_ttf.h"
 
 typedef struct {
-  int x;
-  int y;
+  SDL_Rect* screenPos;
   SDL_Texture* tex;
 } Invader;
+
+//function prototypes
+Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font);
+void destroyInvader(Invader* invader);
 
 #endif

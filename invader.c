@@ -6,7 +6,7 @@
 
 Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font) {
   //allocate memory for invader
-  Invader* newInvader = (Invader*) malloc(sizeof(Invader));
+  Invader* newInvader = malloc(sizeof(Invader));
   if (newInvader == NULL)
     {
       printf("Cannot allocate memory for new invader!\n");
@@ -27,10 +27,21 @@ Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font)
       exit(1);
     }
   //assign others
-  newInvader->x = x;
-  newInvader->y = y;
+  newInvader->screenPos = malloc(sizeof(SDL_Rect));
+  newInvader->screenPos->x = x;
+  newInvader->screenPos->y = y;
+  newInvader->screenPos->h = 15;
+  newInvader->screenPos->w = 15;
   //cleanup
   SDL_FreeSurface(surf);
 
   return(newInvader);
+}
+
+void destroyInvader(Invader* invader) {
+  //kill the texture
+  SDL_DestroyTexture(invader->tex);
+  //kill the rest
+  free(invader->screenPos);
+  free(invader);
 }
