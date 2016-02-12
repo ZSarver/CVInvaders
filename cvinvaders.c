@@ -39,7 +39,6 @@ int main(int argc, char *argv[])
       printf("oops you bwoke it \n TTF_OpenFont failed \n");
       return 1;
     }
-  SDL_SetTextureBlendMode(textTex,SDL_BLENDMODE_BLEND);
 
   //make a few invaders
   Invader* inv1 = createInvader('Z', 100, 100, rend, orbitron);

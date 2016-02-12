@@ -12,5 +12,6 @@ typedef struct {
 //function prototypes
 Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font);
 void destroyInvader(Invader* invader);
+int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TTF_Font* font);
 
 #endif
