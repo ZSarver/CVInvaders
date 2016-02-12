@@ -47,10 +47,15 @@ void destroyInvader(Invader* invader) {
 }
 
 int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TTF_Font* font) {
-  /*loads a new wave of invaders from the given file. Probably a crappy use of
+  /*
+    loads a new wave of invaders from the given file. Probably a crappy use of
     SDL_RWops but also probably more portable than stdio file io. Since every
     invader wave has at most 55 invaders (5 rows by 11 columns), I'm hardcoding
-    that as the length of waveData[]. Deal with it */
+    that as the length of waveData[]. Deal with it.
+    
+    I guess I should say that I'm using an array for KISS reasons. We have a small
+    hard upper bound on the number of possible invaders on screen at any given time,
+    so why bring linked structures into the mix when we don't have to? */
   
   /*initialize waveData. The main loop will stop its invader logic the first time
     it hits a NULL */
@@ -98,7 +103,7 @@ int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TT
         {
           //either error or EOF
           return 1;
-       }
+        }
 
       //handle newlines. either increment y or quit on a newline
       if(buf[0] == '\n')
@@ -146,7 +151,7 @@ int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TT
       //have we gone too far?
       if(arrayY > 4)
         {
-          break;
+          return 0;
         }
 
       //everything went well, so increment to the next array element
