@@ -29,21 +29,24 @@ int main(int argc, char *argv[])
   SDL_Window* window  = SDL_CreateWindow("test", 100, 100, 800, 600, 0);
 
   //set up renderer
-  SDL_Renderer* rend  = SDL_CreateRenderer(window, -1,
-                                           SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+  SDL_Renderer* rend  =
+    SDL_CreateRenderer(window, -1,
+                       SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
   
   //open font
-  TTF_Font* orbitron = TTF_OpenFont("theleagueof-orbitron-13e6a52\\Orbitron Light.ttf",15);
+  TTF_Font* orbitron =
+    TTF_OpenFont("theleagueof-orbitron-13e6a52\\Orbitron Light.otf",24);
   if (!orbitron)
     {
       printf("oops you bwoke it \n TTF_OpenFont failed \n");
       return 1;
     }
+  TTF_SetFontHinting(orbitron, TTF_HINTING_MONO);
 
   //make a few invaders
-  Invader* inv1 = createInvader('Z', 100, 100, rend, orbitron);
-  Invader* inv2 = createInvader('a', 120, 100, rend, orbitron);
-  Invader* inv3 = createInvader('c', 140, 100, rend, orbitron);
+  Invader* inv1 = createInvader("Z", 100, 100, rend, orbitron);
+  Invader* inv2 = createInvader("a", 120, 100, rend, orbitron);
+  Invader* inv3 = createInvader("c", 140, 100, rend, orbitron);
   
   //dark grey, cooler than black
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);

@@ -4,7 +4,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font) {
+Invader* createInvader(char c[],
+                       int x, int y, SDL_Renderer* rend, TTF_Font* font) {
   //allocate memory for invader
   Invader* newInvader = malloc(sizeof(Invader));
   if (newInvader == NULL)
@@ -18,7 +19,7 @@ Invader* createInvader(char c, int x, int y, SDL_Renderer* rend, TTF_Font* font)
   textColor.g = 255;
   textColor.b = 255;
   textColor.a = 255;
-  SDL_Surface* surf = TTF_RenderText_Blended(font, &c, textColor);
+  SDL_Surface* surf = TTF_RenderText_Blended(font, c, textColor);
   newInvader->tex = SDL_CreateTextureFromSurface(rend,surf);
   //error checking
   if (newInvader->tex == NULL)
@@ -139,7 +140,7 @@ int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TT
       
       x = 50 + arrayX * w + (arrayX * w)/2;
       y = 50 + arrayY * w + (arrayY * w)/2;
-      waveData[arrayIndex] = createInvader(buf[0], x, y, rend, font);
+      waveData[arrayIndex] = createInvader(buf, x, y, rend, font);
 
       //increment!
       if(arrayX > 10)
