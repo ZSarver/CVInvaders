@@ -5,7 +5,8 @@
 #include <stdlib.h>
 
 Invader* createInvader(char c[],
-                       int x, int y, SDL_Renderer* rend, TTF_Font* font) {
+                       int x, int y, int h, int w,
+                       SDL_Renderer* rend, TTF_Font* font) {
   //allocate memory for invader
   Invader* newInvader = malloc(sizeof(Invader));
   if (newInvader == NULL)
@@ -31,8 +32,8 @@ Invader* createInvader(char c[],
   newInvader->screenPos = malloc(sizeof(SDL_Rect));
   newInvader->screenPos->x = x;
   newInvader->screenPos->y = y;
-  newInvader->screenPos->h = 15;
-  newInvader->screenPos->w = 15;
+  newInvader->screenPos->h = h;
+  newInvader->screenPos->w = w;
   //cleanup
   SDL_FreeSurface(surf);
 
@@ -47,16 +48,18 @@ void destroyInvader(Invader* invader) {
   free(invader);
 }
 
-int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TTF_Font* font) {
+int loadInvaderWave(SDL_RWops* file,
+                    Invader* waveData[], SDL_Renderer* rend, TTF_Font* font) {
   /*
     loads a new wave of invaders from the given file. Probably a crappy use of
-    SDL_RWops but also probably more portable than stdio file io. Since every
-    invader wave has at most 55 invaders (5 rows by 11 columns), I'm hardcoding
-    that as the length of waveData[]. Deal with it.
+    SDL_RWops but also probably the most portable, as if I care about
+    that. Since every invader wave has at most 55 invaders (5 rows by 11
+    columns), I'm hardcoding that as the length of waveData[]. Deal with it.
     
-    I guess I should say that I'm using an array for KISS reasons. We have a small
-    hard upper bound on the number of possible invaders on screen at any given time,
-    so why bring linked structures into the mix when we don't have to? */
+    I guess I should say that I'm using an array for KISS reasons. We have a
+    small hard upper bound on the number of possible invaders on screen at any
+    given time, so why bring linked structures into the mix when we don't have
+    to? */
   
   /*initialize waveData. The main loop will stop its invader logic the first time
     it hits a NULL */
@@ -73,7 +76,7 @@ int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TT
   int arrayX = 0;
   int arrayY = 0;
 
-  //variables to keep track of where we are on screenspace
+  //varieables to keep track of where we are on screenspace
   int x = 0;
   int y = 0;
 
@@ -82,80 +85,68 @@ int loadInvaderWave(SDL_RWops* file, Invader* waveData[], SDL_Renderer* rend, TT
     + 10(1/2)w = 800 where w is invader width. Hence 16w = 700 and so w =
     43.75. Let's round that up to 44 and cut into the margins by handful of
     pixels. Also, it's invader height too. */
-  int w = 44;
+  int w = 37;
   
   //our tiny buffer
   char buf[5];
 
-  //no loop is complete without an index
-  int arrayIndex = 0;
-
-  while(arrayIndex < 55)
-    {
-      //clear buffer
-      for (int i = 0; i++; i < 5)
-        {
-          buf[i] = 0;
+  for(int arrayIndex = 0; arrayIndex < 55; arrayIndex++) {
+    //clear buffer
+    for (int i = 0; i++; i < 5)
+      {
+        buf[i] = 0;
+      }
+    
+    /*read a character. Text-file is assumed to be ANSI-encoded (i.e.
+      Windows-1252 */
+    if(file->read(file, buf, sizeof(char), 1) == 0)
+      {
+        //either error or EOF
+        return 1;
+      }
+    
+    //handle newlines. either increment y or quit on a newline
+    if(buf[0] == '\n')
+      {
+        arrayY++;
+        if(arrayY > 4)
+          {
+            return 0;
+          }
+        else
+          {
+            continue;
+          }
+      }
+    
+    //handle spaces.
+    if(buf[0] == ' ') {
+      arrayX++;
+      if(arrayX > 10) {
+        arrayY++;
+        if(arrayY > 4) {
+          break;
         }
-
-      /*read a character. Text-file is assumed to be ANSI-encoded (i.e.
-        Windows-1252 */
-      if(file->read(file, buf, sizeof(char), 1) == 0)
-        {
-          //either error or EOF
-          return 1;
+        else {
+          continue;
         }
-
-      //handle newlines. either increment y or quit on a newline
-      if(buf[0] == '\n')
-        {
-          arrayY++;
-          if(arrayY > 4)
-            {
-              return 0;
-            }
-          else
-            {
-              continue;
-            }
-        }
-
-      //handle spaces.
-      if(buf[0] == ' ')
-        {
-          arrayX++;
-          if(arrayX > 10)
-            {
-              arrayY++;
-              if(arrayY > 4)
-                {
-                  break;
-                }
-              else
-                {
-                  continue;
-                }
-            }
-        }
-      
-      x = 50 + arrayX * w + (arrayX * w)/2;
-      y = 50 + arrayY * w + (arrayY * w)/2;
-      waveData[arrayIndex] = createInvader(buf, x, y, rend, font);
-
-      //increment!
-      if(arrayX > 10)
-        {
-          arrayX = 0;
-          arrayY ++;
-        }
-
-      //have we gone too far?
-      if(arrayY > 4)
-        {
-          return 0;
-        }
-
-      //everything went well, so increment to the next array element
-      arrayIndex++;
+      }
     }
+    
+    x = 50 + arrayX * w + (arrayX * w)/2;
+    y = 50 + arrayY * w + (arrayY * w)/2;
+    waveData[arrayIndex] = createInvader(buf, x, y, w, w, rend, font);
+    
+    //increment!
+    if(arrayX++ > 10) {
+      arrayX = 0;
+      arrayY++;
+    }
+    
+    //have we gone too far?
+    if(arrayY > 4) {
+      return 0;
+    }
+  }
+  return 0;
 }
