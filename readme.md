@@ -1,4 +1,4 @@
-Putting the "fun" in rejection!
+Putting the fun in "rejection!"
 ===============================
 
 On the job market? Tired of giving your prospective employers only the ordinary
@@ -10,27 +10,23 @@ Just put your job application or other text into the file "cvtext.txt"!
 But that's not all! This handy rejection-enabling app is great for all these
 situations and more!
 
-Dating websites
----------------
+#### Dating websites
 
 Rest comfortably in the knowledge that while she'll never reply to your message,
 she's having a *blast* shooting your heart to pieces!
 
-Grant applications
-------------------
+#### Grant applications
 
 The NSF won't be funding your modest attempt to push back the boundaries of
 knowledge, but they will thoroughly enjoy blowing away your chances of making
 tenure!
 
-Todo lists
-----------
+#### Todo lists
 
 Don't want to mow the lawn? Who does! Send that pesky reminder to be responsible
 straight to digital hell!
 
-That novel you've been working on for like six years
-----------------------------------------------------
+#### That novel you've been working on for like six years
 
 Let's face it, even if you ever did bother to finish that thing anyway, it's got
 a boring premise. No one's going to publish or read it. Open fire with your
@@ -48,7 +44,8 @@ It should build with no problem at all on *nix (including OSX) as long as you
 have the above, minus MinGW, with a couple of minor edits to the
 Sconstruct. Godspeed! 
 
+Oh yeah, it doesn't actually do anything yet
+============================================
 
-
-Font from: https://www.theleagueofmoveabletype.com/orbitron under the SIL Open
+But I got the font from: https://www.theleagueofmoveabletype.com/orbitron under the SIL Open
 Font License.
