@@ -84,3 +84,4 @@ $RECYCLE.BIN/
 
 # Emacs backup files
 *~
+*.dblite

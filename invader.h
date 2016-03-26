@@ -5,7 +5,7 @@
 #include "SDL_ttf.h"
 
 typedef struct {
-  SDL_Rect* screenPos;
+  SDL_Rect* hitbox;
   SDL_Texture* tex;
 } Invader;
 

@@ -1,4 +1,5 @@
 #include "invader.h"
+#include "common.h"
 #include "SDL.h"
 #include "SDL_ttf.h"
 #include <stdio.h>
@@ -29,11 +30,11 @@ Invader* createInvader(char c[],
       exit(1);
     }
   //assign others
-  newInvader->screenPos = malloc(sizeof(SDL_Rect));
-  newInvader->screenPos->x = x;
-  newInvader->screenPos->y = y;
-  newInvader->screenPos->h = h;
-  newInvader->screenPos->w = w;
+  newInvader->hitbox = malloc(sizeof(SDL_Rect));
+  newInvader->hitbox->x = x;
+  newInvader->hitbox->y = y;
+  newInvader->hitbox->h = h;
+  newInvader->hitbox->w = w;
   //cleanup
   SDL_FreeSurface(surf);
 
@@ -44,7 +45,7 @@ void destroyInvader(Invader* invader) {
   //kill the texture
   SDL_DestroyTexture(invader->tex);
   //kill the rest
-  free(invader->screenPos);
+  free(invader->hitbox);
   free(invader);
 }
 
@@ -85,7 +86,7 @@ int loadInvaderWave(SDL_RWops* file,
     + 10(1/2)w = 800 where w is invader width. Hence 16w = 700 and so w =
     43.75. Let's round that up to 44 and cut into the margins by handful of
     pixels. Also, it's invader height too. */
-  int w = 37;
+  int w = WIDTH;
   
   //our tiny buffer
   char buf[5];

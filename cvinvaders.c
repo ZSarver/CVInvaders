@@ -67,12 +67,12 @@ int main(int argc, char *argv[])
     {
       //let's draw some stuff
       SDL_RenderClear(rend);
-      //SDL_RenderCopy(rend, inv1->tex, NULL, inv1->screenPos);
-      //SDL_RenderCopy(rend, inv2->tex, NULL, inv2->screenPos);
-      //SDL_RenderCopy(rend, inv3->tex, NULL, inv3->screenPos);
+      //SDL_RenderCopy(rend, inv1->tex, NULL, inv1->hitbox);
+      //SDL_RenderCopy(rend, inv2->tex, NULL, inv2->hitbox);
+      //SDL_RenderCopy(rend, inv3->tex, NULL, inv3->hitbox);
       for (int i = 0; i < 55; i++) {
         if (wave[i] != NULL) {
-          SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->screenPos);
+          SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
         }
       }
       SDL_RenderPresent(rend);
