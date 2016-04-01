@@ -81,34 +81,47 @@ int main(int argc, char *argv[])
     
     //get all the events this frame
     while (SDL_PollEvent(&event)){
-      if (event.type == SDL_QUIT){
+      switch (event.type) {
+      case SDL_QUIT:
         shouldQuit = true;
-      }
-      //keyboard events,
-      if (event.type == SDL_KEYDOWN){
-        if (event.key.keysym.sym == SDLK_LEFT && ship->hitbox->x > 0) {
-          ship->vel = -1;
+        break;
+      case SDL_KEYDOWN:
+        switch (event.key.keysym.sym) {
+        case SDLK_LEFT:
+          if (ship->hitbox->x > 0) {
+            ship->vel = -1;
+          }
+          break;
+        case SDLK_RIGHT:
+          if (ship->hitbox->x < 800) {
+            ship->vel = 1;
+          }
+          break;
+        case SDLK_UP:
+        case SDLK_SPACE:
+          if (ship->bullet == NULL) {
+            ship->bullet = createBullet(ship->hitbox->x, ship->hitbox->y + 10,
+                                        rend, orbitron);
+          }
+          break;
+        case SDLK_ESCAPE:
+          shouldQuit = true;
+          break;
+        default:
+          break;
         }
-        if (event.key.keysym.sym == SDLK_RIGHT && ship->hitbox->x < 800) {
-          ship->vel = 1;
-        }
-        if (event.key.keysym.sym == SDLK_UP && ship->bullet == NULL) {
-          ship->bullet = createBullet(ship->hitbox->x, ship->hitbox->y + 10,
-                                      rend, orbitron);
-        }
-      }
-      if (event.type == SDL_KEYUP){
-        if (event.key.keysym.sym == SDLK_LEFT) {
+        break;
+      case SDL_KEYUP:
+        switch (event.key.keysym.sym) {
+        case SDLK_LEFT:
+        case SDLK_RIGHT:
           ship->vel = 0;
-        }
-        if (event.key.keysym.sym == SDLK_RIGHT) {
-          ship->vel = 0;
+          break;
+        default:
+          break;
         }
       }
     }
-
-    //keyboard input is actually smoother if it isn't even-based
-
     //update objects
     if (ship->bullet != NULL) {
       ship->bullet->hitbox->y += ship->bullet->vel * SPEED;
