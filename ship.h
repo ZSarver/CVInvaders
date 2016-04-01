@@ -18,7 +18,7 @@ typedef struct {
 Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font);
 void destroyBullet(Bullet* bullet);
 
-Ship* createShip(int x, int y, SDL_Renderer* rend);
+Ship* createShip(int x, int y, SDL_Renderer* rend, TTF_Font* font);
 void destroyShip(Ship* ship);
 
 #endif

@@ -1,9 +1,12 @@
 #include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+
 #include "SDL.h"
 #include "SDL_ttf.h"
-#include <stdbool.h>
+
 #include "invader.h"
-#include <stdlib.h>
+#include "ship.h"
 
 //int main(int nArg, char* args)
 int main(int argc, char *argv[])
@@ -44,11 +47,6 @@ int main(int argc, char *argv[])
     }
   TTF_SetFontHinting(orbitron, TTF_HINTING_MONO);
 
-  //make a few invaders
-  //Invader* inv1 = createInvader("Z", 100, 100, rend, orbitron);
-  //Invader* inv2 = createInvader("a", 120, 100, rend, orbitron);
-  //Invader* inv3 = createInvader("c", 140, 100, rend, orbitron);
-
   //invader wave time!
   Invader** wave = (Invader**)malloc(sizeof(Invader*)*55);
   SDL_RWops* text = SDL_RWFromFile("cvtext.txt", "r");
@@ -56,6 +54,10 @@ int main(int argc, char *argv[])
     printf("failed to load invader wave \n");
     return 4;
   }
+
+  //let's make a ship and a bullet
+  Ship* ship = createShip(400, 500, rend, orbitron);
+  Bullet* bullet = createBullet(400, 400, rend, orbitron);
   
   //dark grey, cooler than black
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
@@ -67,14 +69,14 @@ int main(int argc, char *argv[])
     {
       //let's draw some stuff
       SDL_RenderClear(rend);
-      //SDL_RenderCopy(rend, inv1->tex, NULL, inv1->hitbox);
-      //SDL_RenderCopy(rend, inv2->tex, NULL, inv2->hitbox);
-      //SDL_RenderCopy(rend, inv3->tex, NULL, inv3->hitbox);
       for (int i = 0; i < 55; i++) {
         if (wave[i] != NULL) {
           SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
         }
       }
+      SDL_RenderCopyEx(rend, ship->tex, NULL, ship->hitbox, 0.0,
+                       NULL, SDL_FLIP_VERTICAL);
+      SDL_RenderCopy(rend, bullet->tex, NULL, bullet->hitbox);
       SDL_RenderPresent(rend);
       
       //get all the events this frame
@@ -88,14 +90,14 @@ int main(int argc, char *argv[])
       frame = frame + 0.5;
     }
 
-  //destroyInvader(inv1);
-  //destroyInvader(inv2);
-  //destroyInvader(inv3);
+  /* cleanup on aisle here */
   for (int i = 0; i < 55; i++) {
     if (wave[i] != NULL) {
       destroyInvader(wave[i]);
     }
   }
+  destroyShip(ship);
+  destroyBullet(bullet);
   SDL_FreeRW(text);
   SDL_DestroyWindow(window);
   TTF_Quit();

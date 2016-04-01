@@ -22,11 +22,15 @@ Invader* createInvader(char c[],
   textColor.b = 255;
   textColor.a = 255;
   SDL_Surface* surf = TTF_RenderText_Blended(font, c, textColor);
+  if (surf == NULL) {
+    printf("Error creating new invader surface! %s\n", SDL_GetError());
+    exit(1);
+  }
   newInvader->tex = SDL_CreateTextureFromSurface(rend,surf);
   //error checking
   if (newInvader->tex == NULL)
     {
-      printf("Error creating new invader texture!\n");
+      printf("Error creating new invader texture! %s, %s\n", SDL_GetError(), c);
       exit(1);
     }
   //assign others
