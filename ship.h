@@ -7,12 +7,14 @@
 typedef struct {
   SDL_Rect* hitbox;
   SDL_Texture* tex;
+  int vel; //velocity
 } Bullet;
 
 typedef struct {
   SDL_Rect* hitbox;
   SDL_Texture* tex;
   Bullet* bullet;
+  int vel; //velocity
 } Ship;
 
 Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font);

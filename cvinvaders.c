@@ -7,6 +7,7 @@
 
 #include "invader.h"
 #include "ship.h"
+#include "common.h"
 
 //int main(int nArg, char* args)
 int main(int argc, char *argv[])
@@ -57,39 +58,67 @@ int main(int argc, char *argv[])
 
   //let's make a ship and a bullet
   Ship* ship = createShip(400, 500, rend, orbitron);
-  Bullet* bullet = createBullet(400, 400, rend, orbitron);
   
   //dark grey, cooler than black
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
   //event loop
   SDL_Event event;
   bool shouldQuit = false;
-  double frame = 0.0;
-  while (!shouldQuit)
-    {
-      //let's draw some stuff
-      SDL_RenderClear(rend);
-      for (int i = 0; i < 55; i++) {
-        if (wave[i] != NULL) {
-          SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
+  while (!shouldQuit){
+    //let's draw some stuff
+    SDL_RenderClear(rend);
+    for (int i = 0; i < 55; i++) {
+      if (wave[i] != NULL) {
+        SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
+      }
+    }
+    SDL_RenderCopyEx(rend, ship->tex, NULL, ship->hitbox, 0.0,
+                     NULL, SDL_FLIP_VERTICAL);
+    if (ship->bullet != NULL) {
+      SDL_RenderCopy(rend, ship->bullet->tex, NULL, ship->bullet->hitbox);
+    }
+    SDL_RenderPresent(rend);
+    
+    //get all the events this frame
+    while (SDL_PollEvent(&event)){
+      if (event.type == SDL_QUIT){
+        shouldQuit = true;
+      }
+      //keyboard events,
+      if (event.type == SDL_KEYDOWN){
+        if (event.key.keysym.sym == SDLK_LEFT && ship->hitbox->x > 0) {
+          ship->vel = -1;
+        }
+        if (event.key.keysym.sym == SDLK_RIGHT && ship->hitbox->x < 800) {
+          ship->vel = 1;
+        }
+        if (event.key.keysym.sym == SDLK_UP && ship->bullet == NULL) {
+          ship->bullet = createBullet(ship->hitbox->x, ship->hitbox->y + 10,
+                                      rend, orbitron);
         }
       }
-      SDL_RenderCopyEx(rend, ship->tex, NULL, ship->hitbox, 0.0,
-                       NULL, SDL_FLIP_VERTICAL);
-      SDL_RenderCopy(rend, bullet->tex, NULL, bullet->hitbox);
-      SDL_RenderPresent(rend);
-      
-      //get all the events this frame
-      while (SDL_PollEvent(&event))
-        {
-          if (event.type == SDL_QUIT)
-            {
-              shouldQuit = true;
-            }
+      if (event.type == SDL_KEYUP){
+        if (event.key.keysym.sym == SDLK_LEFT) {
+          ship->vel = 0;
         }
-      frame = frame + 0.5;
+        if (event.key.keysym.sym == SDLK_RIGHT) {
+          ship->vel = 0;
+        }
+      }
     }
 
+    //keyboard input is actually smoother if it isn't even-based
+
+    //update objects
+    if (ship->bullet != NULL) {
+      ship->bullet->hitbox->y += ship->bullet->vel * SPEED;
+      if (ship->bullet->hitbox->y < 0) {
+        destroyBullet(ship->bullet);
+        ship->bullet = NULL;
+      }
+    }
+    ship->hitbox->x += ship->vel * SPEED;
+  }
   /* cleanup on aisle here */
   for (int i = 0; i < 55; i++) {
     if (wave[i] != NULL) {
@@ -97,7 +126,6 @@ int main(int argc, char *argv[])
     }
   }
   destroyShip(ship);
-  destroyBullet(bullet);
   SDL_FreeRW(text);
   SDL_DestroyWindow(window);
   TTF_Quit();

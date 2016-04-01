@@ -2,5 +2,6 @@
 #define COMMON_H
 
 #define WIDTH 37
+#define SPEED 5
 
 #endif

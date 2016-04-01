@@ -33,6 +33,7 @@ Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font) {
   nb->hitbox->y = y;
   nb->hitbox->h = WIDTH;
   nb->hitbox->w = WIDTH;
+  nb->vel = -1; //all velocities will be multiplied by SPEED
   //cleanup
   SDL_FreeSurface(surf);
 
@@ -45,6 +46,7 @@ void destroyBullet(Bullet* bullet) {
   //and now everything else
   free(bullet->hitbox);
   free(bullet);
+  bullet = NULL;
 }
 
 Ship* createShip(int x, int y, SDL_Renderer* rend, TTF_Font* font) {
@@ -81,6 +83,8 @@ Ship* createShip(int x, int y, SDL_Renderer* rend, TTF_Font* font) {
   ns->hitbox->y = y;
   ns->hitbox->h = WIDTH;
   ns->hitbox->w = WIDTH;
+  ns->bullet = NULL;
+  ns->vel = 0; //all velocities will be multiplied by SPEED
   //cleanup
   SDL_FreeSurface(surf);
 
