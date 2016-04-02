@@ -2,10 +2,10 @@ Putting the fun in "rejection!"
 ===============================
 
 On the job market? Tired of giving your prospective employers only the ordinary
-means of destroying your self-esteem with your email and phone number? Then try
-this handy program! It's ability to turn your CV or resume into a spaceship
-video computer game will let hiring managers *literally* shoot down your dreams!
-Just put your job application or other text into the file "cvtext.txt"!
+means of destroying your self-esteem? Then try this handy program! It's ability
+to turn your CV or resume into a spaceship video computer game will let hiring
+managers *literally* shoot down your dreams!  Just put your job application or
+other text into the file "cvtext.txt"!
 
 But that's not all! This handy rejection-enabling app is great for all these
 situations and more!
@@ -13,7 +13,7 @@ situations and more!
 #### Dating websites
 
 Rest comfortably in the knowledge that while she'll never reply to your message,
-she's having a *blast* shooting your heart to pieces!
+she's having a *blast* leaving your heart in laser-scorched pieces!
 
 #### Grant applications
 
@@ -47,5 +47,7 @@ Sconstruct. Godspeed!
 Oh yeah, it doesn't actually do anything yet
 ============================================
 
-But I got the font from: https://www.theleagueofmoveabletype.com/orbitron under the SIL Open
-Font License.
+Well, you can shoot at the invaders, but they don't shoot back. Or even try to
+dodge or anything. They're pretty lazy. But I got the font from:
+https://www.theleagueofmoveabletype.com/orbitron under the SIL Open Font
+License.
