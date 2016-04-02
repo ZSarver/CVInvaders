@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "SDL.h"
 #include "SDL_ttf.h"
@@ -56,8 +57,44 @@ int main(int argc, char *argv[])
     return 4;
   }
 
-  //let's make a ship and a bullet
+  //let's make a ship
   Ship* ship = createShip(400, 500, rend, orbitron);
+
+  //points!
+  int score = 0;
+  int oldscore = -1;
+  SDL_Surface* scorelabelsurf = NULL;
+  SDL_Texture* scorelabeltex = NULL;
+  SDL_Surface* scoresurf = NULL;
+  SDL_Texture* scoretex = NULL;
+  char scorestring[20] = "";
+  itoa(score*100, scorestring, 10);
+  SDL_Rect scorelabelbox;
+  scorelabelbox.x = 0;
+  scorelabelbox.y = 0;
+  scorelabelbox.h = WIDTH/2;
+  scorelabelbox.w = 50;
+  SDL_Rect scorebox;
+  scorebox.x = 51;
+  scorebox.y = 0;
+  scorebox.h = WIDTH/2;
+  scorebox.w = WIDTH/2;
+  SDL_Color scorecolor;
+  scorecolor.r = 255;
+  scorecolor.g = 255;
+  scorecolor.b = 255;
+  scorecolor.a = 255;
+  
+  scorelabelsurf = TTF_RenderText_Blended(orbitron, "Score: ", scorecolor);
+  if (scorelabelsurf == NULL) {
+    printf("Error creating score surface! %s\n", SDL_GetError());
+    exit(1);
+  }
+  scorelabeltex = SDL_CreateTextureFromSurface(rend,scorelabelsurf);
+  if (scorelabeltex == NULL){
+    printf("Error creatings score texture! %s\n", SDL_GetError());
+    exit(1);
+  }
   
   //dark grey, cooler than black
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
@@ -67,7 +104,7 @@ int main(int argc, char *argv[])
   while (!shouldQuit){
     //let's draw some stuff
     SDL_RenderClear(rend);
-    for (int i = 0; i < 55; i++) {
+    for (int i = 0; i < WAVELENGTH; i++) {
       if (wave[i] != NULL) {
         SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
       }
@@ -77,6 +114,27 @@ int main(int argc, char *argv[])
     if (ship->bullet != NULL) {
       SDL_RenderCopy(rend, ship->bullet->tex, NULL, ship->bullet->hitbox);
     }
+
+    //render score. It can only change like once every 300 frames so might as
+    //well render it nice
+    if (score != oldscore){
+      itoa(score*100, scorestring, 10);
+      scoresurf = TTF_RenderText_Blended(orbitron, scorestring, scorecolor);
+      if (scoresurf == NULL) {
+        printf("Error creating score surface! %s\n", SDL_GetError());
+        exit(1);
+      }
+      scoretex = SDL_CreateTextureFromSurface(rend,scoresurf);
+      if (scoretex == NULL){
+        printf("Error creatings score texture! %s\n", SDL_GetError());
+        exit(1);
+      }
+      oldscore = score;
+      scorebox.w = WIDTH/2 * (int)log10((score)*1000);
+    }
+    SDL_RenderCopy(rend, scorelabeltex, NULL, &scorelabelbox);
+    SDL_RenderCopy(rend, scoretex, NULL, &scorebox);
+    
     SDL_RenderPresent(rend);
     
     //get all the events this frame
@@ -122,6 +180,19 @@ int main(int argc, char *argv[])
         }
       }
     }
+    //collision detection
+    for (int i = 0; i < WAVELENGTH; i++) {
+      if(wave[i] != NULL && ship->bullet != NULL) {
+        if(SDL_HasIntersection(ship->bullet->hitbox, wave[i]->hitbox)) {
+          score += 1;
+          destroyInvader(wave[i]);
+          destroyBullet(ship->bullet);
+          wave[i] = NULL;
+          ship->bullet = NULL;
+        }
+      }
+    }
+    
     //update objects
     if (ship->bullet != NULL) {
       ship->bullet->hitbox->y += ship->bullet->vel * SPEED;

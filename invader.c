@@ -111,17 +111,12 @@ int loadInvaderWave(SDL_RWops* file,
       }
     
     //handle newlines. either increment y or quit on a newline
-    if(buf[0] == '\n')
-      {
-        arrayY++;
-        if(arrayY > 4)
-          {
-            return 0;
-          }
-        else
-          {
-            continue;
-          }
+    if(buf[0] == '\n') {
+      arrayY++;
+      if(arrayY > 4) {
+        return 0;
+      }
+      continue;
       }
     
     //handle spaces.
@@ -129,13 +124,12 @@ int loadInvaderWave(SDL_RWops* file,
       arrayX++;
       if(arrayX > 10) {
         arrayY++;
+        arrayX = 0;
         if(arrayY > 4) {
-          break;
-        }
-        else {
-          continue;
+          return 0;
         }
       }
+      continue;
     }
     
     x = 50 + arrayX * w + (arrayX * w)/2;

@@ -3,5 +3,6 @@
 
 #define WIDTH 37
 #define SPEED 5
+#define WAVELENGTH 55
 
 #endif
