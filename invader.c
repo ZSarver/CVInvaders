@@ -39,6 +39,7 @@ Invader* createInvader(char c[],
   newInvader->hitbox->y = y;
   newInvader->hitbox->h = h;
   newInvader->hitbox->w = w;
+  newInvader->x = x;
   //cleanup
   SDL_FreeSurface(surf);
 

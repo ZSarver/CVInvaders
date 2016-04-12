@@ -56,6 +56,11 @@ int main(int argc, char *argv[])
     printf("failed to load invader wave \n");
     return 4;
   }
+  //invader velocity is collective
+  int invadersKilled = 0;
+  int invaderLR = 1; //left is -1 right is 1
+  double invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
+  SDL_bool movedDown = false;
 
   //let's make a ship
   Ship* ship = createShip(400, 500, rend, orbitron);
@@ -190,6 +195,9 @@ int main(int argc, char *argv[])
       if(wave[i] != NULL && ship->bullet != NULL) {
         if(SDL_HasIntersection(ship->bullet->hitbox, wave[i]->hitbox)) {
           score += 1;
+          invadersKilled += 1;
+          //recalculate invader velocity on a kill
+          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
           destroyInvader(wave[i]);
           destroyBullet(ship->bullet);
           wave[i] = NULL;
@@ -198,7 +206,8 @@ int main(int argc, char *argv[])
       }
     }
     
-    //update objects
+    /*** Update objects ***/
+    //ship stuff
     if (ship->bullet != NULL) {
       ship->bullet->hitbox->y += ship->bullet->vel * SPEED * curTime;
       if (ship->bullet->hitbox->y < 0) {
@@ -210,6 +219,31 @@ int main(int argc, char *argv[])
         || (ship->hitbox->x <= 800 - 2 * WIDTH && ship->vel > 0)) {
       ship->hitbox->x += ship->vel * SPEED * curTime;
     }
+    //invader stuff
+    for (int i = 0; i < 55; i++) {
+      if (wave[i] != NULL) {
+        if (wave[i]->hitbox->x >= 800 - 2 * WIDTH) {
+          invaderLR = -1;
+          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
+        }
+        if (wave[i]->hitbox->x < WIDTH) {
+          invaderLR = 1;
+          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
+          //move 'em down
+          if (movedDown == false) {
+            for (int j = 0; j < 55; j++) {
+              if (wave[j] != NULL) {
+                wave[j]->hitbox->y += WIDTH;
+              }
+            }
+            movedDown = true;
+          }
+        }
+        wave[i]->x += invaderVel * SPEED * curTime;
+        wave[i]->hitbox->x = (int)wave[i]->x;
+      }
+    }
+    movedDown = false;
   }
   /* cleanup on aisle here */
   for (int i = 0; i < 55; i++) {

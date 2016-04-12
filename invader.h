@@ -4,9 +4,11 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
+/* Invader movement is fine-grained enough to warrant sub-pixel motion. */
 typedef struct {
   SDL_Rect* hitbox;
   SDL_Texture* tex;
+  double x;
 } Invader;
 
 //function prototypes
