@@ -101,7 +101,12 @@ int main(int argc, char *argv[])
   //event loop
   SDL_Event event;
   bool shouldQuit = false;
+  unsigned int oldTime = 0;
+  unsigned int curTime = 0;
   while (!shouldQuit){
+    //update the timer
+    curTime = SDL_GetTicks() - oldTime;
+    oldTime = SDL_GetTicks();
     //let's draw some stuff
     SDL_RenderClear(rend);
     for (int i = 0; i < WAVELENGTH; i++) {
@@ -146,12 +151,12 @@ int main(int argc, char *argv[])
       case SDL_KEYDOWN:
         switch (event.key.keysym.sym) {
         case SDLK_LEFT:
-          if (ship->hitbox->x > 0) {
+          if (ship->hitbox->x > WIDTH) {
             ship->vel = -1;
           }
           break;
         case SDLK_RIGHT:
-          if (ship->hitbox->x < 800) {
+          if (ship->hitbox->x < 800 - WIDTH) {
             ship->vel = 1;
           }
           break;
@@ -195,13 +200,16 @@ int main(int argc, char *argv[])
     
     //update objects
     if (ship->bullet != NULL) {
-      ship->bullet->hitbox->y += ship->bullet->vel * SPEED;
+      ship->bullet->hitbox->y += ship->bullet->vel * SPEED * curTime;
       if (ship->bullet->hitbox->y < 0) {
         destroyBullet(ship->bullet);
         ship->bullet = NULL;
       }
     }
-    ship->hitbox->x += ship->vel * SPEED;
+    if ((ship->hitbox->x >= WIDTH && ship->vel < 0)
+        || (ship->hitbox->x <= 800 - 2 * WIDTH && ship->vel > 0)) {
+      ship->hitbox->x += ship->vel * SPEED * curTime;
+    }
   }
   /* cleanup on aisle here */
   for (int i = 0; i < 55; i++) {
