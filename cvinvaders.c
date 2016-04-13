@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <math.h>
 
@@ -9,6 +8,7 @@
 #include "invader.h"
 #include "ship.h"
 #include "common.h"
+#include "wave.h"
 
 //int main(int nArg, char* args)
 int main(int argc, char *argv[])
@@ -50,17 +50,12 @@ int main(int argc, char *argv[])
   TTF_SetFontHinting(orbitron, TTF_HINTING_MONO);
 
   //invader wave time!
-  Invader** wave = (Invader**)malloc(sizeof(Invader*)*55);
   SDL_RWops* text = SDL_RWFromFile("cvtext.txt", "r");
+  Wave *wave = (Wave*)malloc(sizeof(Wave));
   if (loadInvaderWave(text, wave, rend, orbitron) != 0) {
-    printf("failed to load invader wave \n");
-    return 4;
+    printf("Error loading invader wave.");
+    return 1;
   }
-  //invader velocity is collective
-  int invadersKilled = 0;
-  int invaderLR = 1; //left is -1 right is 1
-  double invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
-  SDL_bool movedDown = false;
 
   //let's make a ship
   Ship* ship = createShip(400, 500, rend, orbitron);
@@ -105,7 +100,7 @@ int main(int argc, char *argv[])
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
   //event loop
   SDL_Event event;
-  bool shouldQuit = false;
+  SDL_bool shouldQuit = SDL_FALSE;
   unsigned int oldTime = 0;
   unsigned int curTime = 0;
   while (!shouldQuit){
@@ -115,8 +110,8 @@ int main(int argc, char *argv[])
     //let's draw some stuff
     SDL_RenderClear(rend);
     for (int i = 0; i < WAVELENGTH; i++) {
-      if (wave[i] != NULL) {
-        SDL_RenderCopy(rend, wave[i]->tex, NULL, wave[i]->hitbox);
+      if (wave->data[i] != NULL) {
+        SDL_RenderCopy(rend, wave->data[i]->tex, NULL, wave->data[i]->hitbox);
       }
     }
     SDL_RenderCopyEx(rend, ship->tex, NULL, ship->hitbox, 0.0,
@@ -151,7 +146,7 @@ int main(int argc, char *argv[])
     while (SDL_PollEvent(&event)){
       switch (event.type) {
       case SDL_QUIT:
-        shouldQuit = true;
+        shouldQuit = SDL_TRUE;
         break;
       case SDL_KEYDOWN:
         switch (event.key.keysym.sym) {
@@ -173,7 +168,7 @@ int main(int argc, char *argv[])
           }
           break;
         case SDLK_ESCAPE:
-          shouldQuit = true;
+          shouldQuit = SDL_TRUE;
           break;
         default:
           break;
@@ -192,15 +187,15 @@ int main(int argc, char *argv[])
     }
     //collision detection
     for (int i = 0; i < WAVELENGTH; i++) {
-      if(wave[i] != NULL && ship->bullet != NULL) {
-        if(SDL_HasIntersection(ship->bullet->hitbox, wave[i]->hitbox)) {
+      if(wave->data[i] != NULL && ship->bullet != NULL) {
+        if(SDL_HasIntersection(ship->bullet->hitbox, wave->data[i]->hitbox)) {
           score += 1;
-          invadersKilled += 1;
+          wave->invadersKilled += 1;
           //recalculate invader velocity on a kill
-          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
-          destroyInvader(wave[i]);
+          wave->invaderVel = wave->invaderLR * 0.005 * (wave->invadersKilled + 1);
+          destroyInvader(wave->data[i]);
           destroyBullet(ship->bullet);
-          wave[i] = NULL;
+          wave->data[i] = NULL;
           ship->bullet = NULL;
         }
       }
@@ -221,36 +216,32 @@ int main(int argc, char *argv[])
     }
     //invader stuff
     for (int i = 0; i < 55; i++) {
-      if (wave[i] != NULL) {
-        if (wave[i]->hitbox->x >= 800 - 2 * WIDTH) {
-          invaderLR = -1;
-          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
+      if (wave->data[i] != NULL) {
+        if (wave->data[i]->hitbox->x >= 800 - 2 * WIDTH) {
+          wave->invaderLR = -1;
+          wave->invaderVel = wave->invaderLR * 0.005 * (wave->invadersKilled + 1);
         }
-        if (wave[i]->hitbox->x < WIDTH) {
-          invaderLR = 1;
-          invaderVel = invaderLR * 0.005 * (invadersKilled + 1);
+        if (wave->data[i]->hitbox->x < WIDTH) {
+          wave->invaderLR = 1;
+          wave->invaderVel = wave->invaderLR * 0.005 * (wave->invadersKilled + 1);
           //move 'em down
-          if (movedDown == false) {
+          if (wave->movedDown == SDL_FALSE) {
             for (int j = 0; j < 55; j++) {
-              if (wave[j] != NULL) {
-                wave[j]->hitbox->y += WIDTH;
+              if (wave->data[j] != NULL) {
+                wave->data[j]->hitbox->y += WIDTH;
               }
             }
-            movedDown = true;
+            wave->movedDown = SDL_TRUE;
           }
         }
-        wave[i]->x += invaderVel * SPEED * curTime;
-        wave[i]->hitbox->x = (int)wave[i]->x;
+        wave->data[i]->x += wave->invaderVel * SPEED * curTime;
+        wave->data[i]->hitbox->x = (int)wave->data[i]->x;
       }
     }
-    movedDown = false;
+    wave->movedDown = SDL_FALSE;
   }
   /* cleanup on aisle here */
-  for (int i = 0; i < 55; i++) {
-    if (wave[i] != NULL) {
-      destroyInvader(wave[i]);
-    }
-  }
+  destroyWave(wave);
   destroyShip(ship);
   SDL_FreeRW(text);
   SDL_DestroyWindow(window);
