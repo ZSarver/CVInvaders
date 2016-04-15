@@ -39,6 +39,11 @@ Invader* createInvader(char c[],
   newInvader->hitbox->y = y;
   newInvader->hitbox->h = h;
   newInvader->hitbox->w = w;
+  newInvader->startingPos = malloc(sizeof(SDL_Rect));
+  newInvader->startingPos->x = x;
+  newInvader->startingPos->y = y;
+  newInvader->startingPos->h = h;
+  newInvader->startingPos->w = w;
   newInvader->x = x;
   //cleanup
   SDL_FreeSurface(surf);
@@ -51,5 +56,13 @@ void destroyInvader(Invader* invader) {
   SDL_DestroyTexture(invader->tex);
   //kill the rest
   free(invader->hitbox);
+  free(invader->startingPos);
   free(invader);
+}
+
+void resetInvader(Invader *inv) {
+  //resets the position of an invader
+  inv->hitbox->x = inv->startingPos->x;
+  inv->hitbox->y = inv->startingPos->y;
+  inv->x = inv->startingPos->x;
 }

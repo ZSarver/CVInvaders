@@ -116,8 +116,16 @@ void destroyWave(Wave *iw) {
   for (int i = 0; i < 55; i++) {
     if (iw->data[i] != NULL) {
       destroyInvader(iw->data[i]);
-      free(iw->data[i]);
     }
   }
   free(iw);
+}
+
+void resetWave(Wave *wa) {
+  /* Resets the wave to starting positions, leaving the NULLs as NULL. */
+  for (int i = 0; i < 55; i++) {
+    if(wa->data[i] != NULL) {
+      resetInvader(wa->data[i]);
+    }
+  }
 }

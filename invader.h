@@ -7,6 +7,7 @@
 /* Invader movement is fine-grained enough to warrant sub-pixel motion. */
 typedef struct {
   SDL_Rect* hitbox;
+  SDL_Rect* startingPos;
   SDL_Texture* tex;
   double x;
 } Invader;
@@ -15,5 +16,5 @@ typedef struct {
 Invader* createInvader(char c[], int x, int y, int h, int w,
                        SDL_Renderer* rend, TTF_Font* font);
 void destroyInvader(Invader* invader);
-
+void resetInvader(Invader *inv);
 #endif

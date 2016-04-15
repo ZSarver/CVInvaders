@@ -187,6 +187,7 @@ int main(int argc, char *argv[])
     }
     //collision detection
     for (int i = 0; i < WAVELENGTH; i++) {
+      //invader/bullet collision
       if(wave->data[i] != NULL && ship->bullet != NULL) {
         if(SDL_HasIntersection(ship->bullet->hitbox, wave->data[i]->hitbox)) {
           score += 1;
@@ -197,6 +198,13 @@ int main(int argc, char *argv[])
           destroyBullet(ship->bullet);
           wave->data[i] = NULL;
           ship->bullet = NULL;
+        }
+      }
+      //invader/ship collisions
+      if(wave->data[i] != NULL) {
+        if(SDL_HasIntersection(ship->hitbox, wave->data[i]->hitbox)) {
+          resetWave(wave);
+          break;
         }
       }
     }
