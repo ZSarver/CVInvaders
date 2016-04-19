@@ -44,10 +44,8 @@ It should build with no problem at all on *nix (including OSX) as long as you
 have the above, minus MinGW, with a couple of minor edits to the
 Sconstruct. Godspeed! 
 
-Oh yeah, it doesn't actually do anything yet
+The Font is Awesome
 ============================================
 
-Well, you can shoot at the invaders, but they don't shoot back. Or even try to
-dodge or anything. They're pretty lazy. But I got the font from:
-https://www.theleagueofmoveabletype.com/orbitron under the SIL Open Font
-License.
+I got the font from: https://www.theleagueofmoveabletype.com/orbitron under the
+SIL Open Font License.
