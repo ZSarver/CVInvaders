@@ -17,7 +17,7 @@ typedef struct {
   Invader *data[55];
 } Wave;
 
-int loadInvaderWave(SDL_RWops* file, Wave *nw, SDL_Renderer* rend,
+int loadInvaderWave(FILE *text, Wave *nw, SDL_Renderer* rend,
                      TTF_Font* font);
 void destroyWave(Wave *iw);
 void resetWave(Wave *wa);

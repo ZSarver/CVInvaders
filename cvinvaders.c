@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
   TTF_SetFontHinting(orbitron, TTF_HINTING_MONO);
 
   //invader wave time!
-  SDL_RWops* text = SDL_RWFromFile("cvtext.txt", "r");
+  FILE *text = fopen("cvtext.txt", "r");
   Wave *wave = (Wave*)malloc(sizeof(Wave));
-  if (loadInvaderWave(text, wave, rend, orbitron) != 0) {
+  if (loadInvaderWave(text, wave, rend, orbitron) > 0) {
     printf("Error loading invader wave.");
     return 1;
   }
@@ -115,6 +115,16 @@ int main(int argc, char *argv[])
     instructionsBox[i].h = 80;
     instructionsBox[i].w = 600;
   }
+
+  //set up congrats
+  char congrats[] = "Congratulations!";
+  SDL_Surface *congratsSurf = TTF_RenderText_Blended(orbitron, congrats, white);
+  SDL_Texture *congratsTex = SDL_CreateTextureFromSurface(rend, congratsSurf);
+  SDL_Rect congratsBox;
+  congratsBox.x = 100;
+  congratsBox.w = 600;
+  congratsBox.y = 250;
+  congratsBox.h = 100;
   
   //dark grey, cooler than black
   SDL_SetRenderDrawColor(rend, 25, 25, 25, 255);
@@ -126,6 +136,21 @@ int main(int argc, char *argv[])
   unsigned int curTime = 0;
   while (state != QUIT){
     switch (state) {
+    case CONGRATULATIONS:
+      SDL_RenderClear(rend);
+      SDL_RenderCopy(rend, congratsTex, NULL, &congratsBox);
+      SDL_RenderPresent(rend);
+      while (SDL_PollEvent(&event)) {
+        switch (event.type) {
+        case SDL_QUIT:
+        case SDL_KEYDOWN:
+          state = QUIT;
+          break;
+        default:
+          break;
+        }
+      }
+      break;
     case INSTRUCTIONS:
       SDL_RenderClear(rend);
       for (int i = 0; i < 4; i++) {
@@ -235,7 +260,7 @@ int main(int argc, char *argv[])
       }
       //collision detection
       for (int i = 0; i < WAVELENGTH; i++) {
-        //invader/bullet collision
+        //invader-bullet collision
         if(wave->data[i] != NULL && ship->bullet != NULL) {
           if(SDL_HasIntersection(ship->bullet->hitbox, wave->data[i]->hitbox)) {
             score += 1;
@@ -303,6 +328,18 @@ int main(int argc, char *argv[])
         }
       }
       wave->movedDown = SDL_FALSE;
+
+      //oh my god we killed everything
+      if (wave->invadersKilled == wave->invaderCount) {
+        if (state == LASTWAVE) {
+          state = CONGRATULATIONS;
+        }
+        if (state != QUIT) {
+          if (loadInvaderWave(text, wave, rend, orbitron) == EOF) {
+            state = LASTWAVE;
+          }
+        }
+      }
       break;
       /*** End Shooting ***/
     default:
@@ -312,7 +349,7 @@ int main(int argc, char *argv[])
   /* cleanup on aisle here */
   destroyWave(wave);
   destroyShip(ship);
-  SDL_FreeRW(text);
+  fclose(text);
   SDL_DestroyWindow(window);
   TTF_Quit();
   SDL_Quit();

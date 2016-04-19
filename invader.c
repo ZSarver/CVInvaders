@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-Invader* createInvader(char c[],
+Invader* createInvader(char c,
                        int x, int y, int h, int w,
                        SDL_Renderer* rend, TTF_Font* font) {
   //allocate memory for invader
@@ -21,16 +21,18 @@ Invader* createInvader(char c[],
   textColor.g = 255;
   textColor.b = 255;
   textColor.a = 255;
-  SDL_Surface* surf = TTF_RenderText_Blended(font, c, textColor);
+  SDL_Surface* surf = TTF_RenderText_Blended(font, &c, textColor);
   if (surf == NULL) {
     printf("Error creating new invader surface! %s\n", SDL_GetError());
+    SDL_ClearError();
     exit(1);
   }
   newInvader->tex = SDL_CreateTextureFromSurface(rend,surf);
   //error checking
   if (newInvader->tex == NULL)
     {
-      printf("Error creating new invader texture! %s, %s\n", SDL_GetError(), c);
+      printf("Error creating new invader texture! %s\n", SDL_GetError());
+      SDL_ClearError();
       exit(1);
     }
   //assign others

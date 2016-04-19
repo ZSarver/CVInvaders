@@ -13,7 +13,7 @@ typedef struct {
 } Invader;
 
 //function prototypes
-Invader* createInvader(char c[], int x, int y, int h, int w,
+Invader* createInvader(char c, int x, int y, int h, int w,
                        SDL_Renderer* rend, TTF_Font* font);
 void destroyInvader(Invader* invader);
 void resetInvader(Invader *inv);

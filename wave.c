@@ -7,7 +7,7 @@
 #include "wave.h"
 #include "common.h"
 
-int loadInvaderWave(SDL_RWops* file, Wave *nw, SDL_Renderer* rend,
+int loadInvaderWave(FILE *text, Wave *nw, SDL_Renderer* rend,
                      TTF_Font* font) {
   /*
     loads a new wave of invaders from the given file. Probably a crappy use of
@@ -52,26 +52,24 @@ int loadInvaderWave(SDL_RWops* file, Wave *nw, SDL_Renderer* rend,
     pixels. Also, it's invader height too. */
   int w = WIDTH;
   
-  //our tiny buffer
-  char buf[1];
+  //our buffer. Will cast to char if not EOF
+  int buf;
 
   for(int arrayIndex = 0; arrayIndex < 55; arrayIndex++) {
-    //clear buffer
-    for (int i = 0; i++; i < 5)
-      {
-        buf[i] = 0;
-      }
-    
     /*read a character. Text-file is assumed to be ANSI-encoded (i.e.
       Windows-1252 */
-    if(file->read(file, buf, sizeof(char), 1) == 0)
-      {
-        //either error or EOF
-        return 1;
-      }
+    buf = fgetc(text);
+    if (buf == EOF && ferror(text)) {
+      printf("Error reading from file!");
+      exit(1);
+    }
+    else if (feof(text)) {
+      return EOF;
+    }
     
     //handle newlines. either increment y or quit on a newline
-    if(buf[0] == '\n') {
+    //or EOF
+    if((char)buf == '\n') {
       arrayY++;
       if(arrayY > 4) {
         return 0;
@@ -80,7 +78,7 @@ int loadInvaderWave(SDL_RWops* file, Wave *nw, SDL_Renderer* rend,
       }
     
     //handle spaces.
-    if(buf[0] == ' ') {
+    if((char)buf == ' ') {
       arrayX++;
       if(arrayX > 10) {
         arrayY++;
@@ -94,7 +92,7 @@ int loadInvaderWave(SDL_RWops* file, Wave *nw, SDL_Renderer* rend,
     
     x = 50 + arrayX * w + (arrayX * w)/2;
     y = 50 + arrayY * w + (arrayY * w)/2;
-    nw->data[arrayIndex] = createInvader(buf, x, y, w, w, rend, font);
+    nw->data[arrayIndex] = createInvader((char)buf, x, y, w, w, rend, font);
     nw->invaderCount += 1;
     
     //increment!

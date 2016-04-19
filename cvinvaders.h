@@ -4,6 +4,8 @@
 typedef enum {
   INSTRUCTIONS,
   SHOOTING,
+  LASTWAVE,
+  CONGRATULATIONS,
   QUIT
 } GameState;
 
