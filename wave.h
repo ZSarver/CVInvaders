@@ -21,5 +21,6 @@ int loadInvaderWave(FILE *text, Wave *nw, SDL_Renderer* rend,
                      TTF_Font* font);
 void destroyWave(Wave *iw);
 void resetWave(Wave *wa);
+void spawnBullets(Wave *wa, SDL_Renderer *rend, TTF_Font *font);
 
 #endif

@@ -17,7 +17,7 @@ typedef struct {
   int vel; //velocity
 } Ship;
 
-Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font);
+Bullet* createBullet(int x, int y, int vel, SDL_Renderer* rend, TTF_Font* font);
 void destroyBullet(Bullet* bullet);
 
 Ship* createShip(int x, int y, SDL_Renderer* rend, TTF_Font* font);

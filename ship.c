@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font) {
+Bullet* createBullet(int x, int y, int vel, SDL_Renderer* rend, TTF_Font* font) {
   //allocate memory for bullet
   Bullet* nb = malloc(sizeof(Bullet));
   if (nb == NULL) {
@@ -33,7 +33,7 @@ Bullet* createBullet(int x, int y, SDL_Renderer* rend, TTF_Font* font) {
   nb->hitbox->y = y;
   nb->hitbox->h = WIDTH;
   nb->hitbox->w = WIDTH;
-  nb->vel = -1; //all velocities will be multiplied by SPEED
+  nb->vel = vel; //all velocities will be multiplied by SPEED
   //cleanup
   SDL_FreeSurface(surf);
 
@@ -46,7 +46,6 @@ void destroyBullet(Bullet* bullet) {
   //and now everything else
   free(bullet->hitbox);
   free(bullet);
-  bullet = NULL;
 }
 
 Ship* createShip(int x, int y, SDL_Renderer* rend, TTF_Font* font) {

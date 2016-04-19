@@ -127,3 +127,21 @@ void resetWave(Wave *wa) {
     }
   }
 }
+
+void spawnBullets(Wave *wa, SDL_Renderer *rend, TTF_Font *font) {
+  //calculate odds of spanning bullets: 1 in enemies left + 1
+  double odds = 1.0 / (wa->invaderCount - wa->invadersKilled + 1);
+  double roll = 0;
+  for (int i = 0; i < WAVELENGTH; i++) {
+    if (wa->data[i] != NULL) {
+      if (wa->data[i]->bullet == NULL) {
+        roll = (double)rand() / (double)RAND_MAX;
+        if (roll <= odds) {
+          wa->data[i]->bullet = createBullet(wa->data[i]->hitbox->x,
+                                             wa->data[i]->hitbox->y,
+                                             1, rend, font);
+        }
+      }
+    }
+  }
+}

@@ -47,6 +47,10 @@ Invader* createInvader(char c,
   newInvader->startingPos->h = h;
   newInvader->startingPos->w = w;
   newInvader->x = x;
+
+  //bullet
+  newInvader->bullet = NULL;
+  
   //cleanup
   SDL_FreeSurface(surf);
 
@@ -59,12 +63,19 @@ void destroyInvader(Invader* invader) {
   //kill the rest
   free(invader->hitbox);
   free(invader->startingPos);
+  if (invader->bullet != NULL) {
+    destroyBullet(invader->bullet);
+  }
   free(invader);
 }
 
 void resetInvader(Invader *inv) {
-  //resets the position of an invader
+  //resets the position of an invader and destroys bullets
   inv->hitbox->x = inv->startingPos->x;
   inv->hitbox->y = inv->startingPos->y;
   inv->x = inv->startingPos->x;
+  if (inv->bullet != NULL) {
+    destroyBullet(inv->bullet);
+    inv->bullet = NULL;
+  }
 }

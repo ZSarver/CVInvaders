@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 #include "SDL.h"
 #include "SDL_ttf.h"
@@ -106,6 +107,7 @@ int main(int argc, char *argv[])
   SDL_Texture *instructionsTex[4];
   SDL_Surface *instructionsSurf;
   SDL_Rect instructionsBox[4];
+  srand(time(NULL));
   for (int i = 0; i < 4; i++) {
     instructionsSurf = TTF_RenderText_Blended(orbitron, instructions[i], white);
     instructionsTex[i] = SDL_CreateTextureFromSurface(rend, instructionsSurf);
@@ -134,6 +136,7 @@ int main(int argc, char *argv[])
   GameState state = INSTRUCTIONS;
   unsigned int oldTime = 0;
   unsigned int curTime = 0;
+  unsigned int bulletTime = 0;
   while (state != QUIT){
     switch (state) {
     case CONGRATULATIONS:
@@ -180,11 +183,16 @@ int main(int argc, char *argv[])
       //update the timer
       curTime = SDL_GetTicks() - oldTime;
       oldTime = SDL_GetTicks();
+      bulletTime += curTime;
       //let's draw some stuff
       SDL_RenderClear(rend);
       for (int i = 0; i < WAVELENGTH; i++) {
         if (wave->data[i] != NULL) {
           SDL_RenderCopy(rend, wave->data[i]->tex, NULL, wave->data[i]->hitbox);
+          if (wave->data[i]->bullet != NULL) {
+            SDL_RenderCopy(rend, wave->data[i]->bullet->tex, NULL,
+                           wave->data[i]->bullet->hitbox);
+          }
         }
       }
       SDL_RenderCopyEx(rend, ship->tex, NULL, ship->hitbox, 0.0,
@@ -237,7 +245,7 @@ int main(int argc, char *argv[])
           case SDLK_SPACE:
             if (ship->bullet == NULL) {
               ship->bullet = createBullet(ship->hitbox->x, ship->hitbox->y + 10,
-                                          rend, orbitron);
+                                          -1, rend, orbitron);
             }
             break;
           case SDLK_ESCAPE:
@@ -260,30 +268,42 @@ int main(int argc, char *argv[])
       }
       //collision detection
       for (int i = 0; i < WAVELENGTH; i++) {
-        //invader-bullet collision
-        if(wave->data[i] != NULL && ship->bullet != NULL) {
-          if(SDL_HasIntersection(ship->bullet->hitbox, wave->data[i]->hitbox)) {
-            score += 1;
-            wave->invadersKilled += 1;
-            //recalculate invader velocity on a kill
-            wave->invaderVel = wave->invaderLR * 0.005 *
-              (wave->invadersKilled + 1);
-            destroyInvader(wave->data[i]);
-            destroyBullet(ship->bullet);
-            wave->data[i] = NULL;
-            ship->bullet = NULL;
+        if (wave->data[i] != NULL) {
+          //invader-bullet collision
+          if(ship->bullet != NULL) {
+            if (SDL_HasIntersection(ship->bullet->hitbox,
+                                    wave->data[i]->hitbox)) {
+              score += 1;
+              wave->invadersKilled += 1;
+              //recalculate invader velocity on a kill
+              wave->invaderVel = wave->invaderLR * 0.005 *
+                (wave->invadersKilled + 1);
+              destroyInvader(wave->data[i]);
+              destroyBullet(ship->bullet);
+              wave->data[i] = NULL;
+              ship->bullet = NULL;
+              break;
+            }
           }
-        }
-        //invader/ship collisions
-        if(wave->data[i] != NULL) {
-          if(SDL_HasIntersection(ship->hitbox, wave->data[i]->hitbox)) {
+          
+          //invader/ship collisions
+          if (SDL_HasIntersection(ship->hitbox, wave->data[i]->hitbox)) {
             resetWave(wave);
             state = INSTRUCTIONS;
             break;
           }
+
+          //ship/bullet collision
+          if(wave->data[i]->bullet != NULL) {
+            if (SDL_HasIntersection(ship->hitbox,
+                                    wave->data[i]->bullet->hitbox)) {
+              resetWave(wave);
+              state = INSTRUCTIONS;
+              break;
+            }
+          }
         }
       }
-      
       /*** Update objects ***/
       //ship stuff
       if (ship->bullet != NULL) {
@@ -297,6 +317,7 @@ int main(int argc, char *argv[])
           || (ship->hitbox->x <= 800 - 2 * WIDTH && ship->vel > 0)) {
         ship->hitbox->x += ship->vel * SPEED * curTime;
       }
+
       //invader stuff
       for (int i = 0; i < 55; i++) {
         if (wave->data[i] != NULL) {
@@ -325,10 +346,21 @@ int main(int argc, char *argv[])
             resetWave(wave);
             state = INSTRUCTIONS;
           }
+          //invader bullets
+          if (wave->data[i]->bullet != NULL) {
+            wave->data[i]->bullet->hitbox->y +=
+              wave->data[i]->bullet->vel * SPEED * curTime;
+          }
         }
       }
-      wave->movedDown = SDL_FALSE;
 
+      if (bulletTime >= BULLETTHRESH) {
+        //spawn bullets once every BULLETTHRESH milliseconds
+        spawnBullets(wave, rend, orbitron);
+        bulletTime = 0;
+      }
+      
+      wave->movedDown = SDL_FALSE;
       //oh my god we killed everything
       if (wave->invadersKilled == wave->invaderCount) {
         if (state == LASTWAVE) {

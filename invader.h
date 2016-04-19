@@ -4,12 +4,15 @@
 #include "SDL.h"
 #include "SDL_ttf.h"
 
+#include "ship.h"
+
 /* Invader movement is fine-grained enough to warrant sub-pixel motion. */
 typedef struct {
   SDL_Rect* hitbox;
   SDL_Rect* startingPos;
   SDL_Texture* tex;
   double x;
+  Bullet *bullet;
 } Invader;
 
 //function prototypes
