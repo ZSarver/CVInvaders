@@ -71,6 +71,7 @@ int loadInvaderWave(FILE *text, Wave *nw, SDL_Renderer* rend,
     //or EOF
     if((char)buf == '\n') {
       arrayY++;
+      arrayX = 0;
       if(arrayY > 4) {
         return 0;
       }
